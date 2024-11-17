@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Video {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  videoData   Bytes     // Store video data directly in PostgreSQL
+  thumbnail   Bytes?    // Store thumbnail data
+  userId      String
+  channelName String
+  views       Int       @default(0)
+  likes       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  isLive      Boolean   @default(false)
+  streamKey   String?   @unique
+  duration    Int?      // Video duration in seconds
+  mimeType    String    // Video MIME type
+  size        Int       // File size in bytes
+  comments    Comment[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  userId    String
+  videoId   String
+  video     Video    @relation(fields: [videoId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
